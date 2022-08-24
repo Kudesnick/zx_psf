@@ -20,12 +20,13 @@ print([rows[i:i+8] for i in range(0, len(rows), 8)])
 
 import struct
 PSF_FONT_MAGIC = 0x864ab572
+OFFSET = 0x20
 header = struct.pack('<8I',
     PSF_FONT_MAGIC, # magic;         /* magic bytes to identify PSF */
     0             , # version;       /* zero */
     8*4           , # headersize;    /* offset of bitmaps in file, 32 */
     0             , # flags;         /* 0 if there's no unicode table */
-    int(len(rows) / 8) , # numglyph;  /* number of glyphs */
+    int(len(rows) / 8) + OFFSET, # numglyph;  /* number of glyphs */
     8             , # bytesperglyph; /* size of each glyph */
     8             , # height;        /* height in pixels */
     8               # width;         /* width in pixels */
@@ -33,6 +34,7 @@ header = struct.pack('<8I',
 
 with open('zx.psf', 'wb') as f:
     f.write(bytes(header))
+    f.write(bytes([0] * OFFSET * 8))
     f.write(bytes(rows))
 
 print('ok')
